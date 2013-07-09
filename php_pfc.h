@@ -70,7 +70,7 @@ typedef struct {
 
 
 
-/* pfc inprove function profile maintains a stack of entries being profiled. The memory for the entry
+/* pfc function profile maintains a stack of entries being profiled. The memory for the entry
  * is passed by the layer that invokes BEGIN_PROFILING(), e.g. the hp_execute()
  * function. Often, this is just C-stack memory.
  *
@@ -79,6 +79,8 @@ typedef struct {
  * profiled. */
 typedef struct mhp_entry_t {
   char                   *name_hprof;                       /* function name */
+  char                   *filename;             /* php script file name */
+  zend_uint            line;                    /* line number of function in script file*/
   int                     rlvl_hprof;        /* recursion level for function */
   uint64                  tsc_start;         /* start value for TSC counter  */
   struct mhp_entry_t      *prev_hprof;    /* ptr to prev entry being profiled */
