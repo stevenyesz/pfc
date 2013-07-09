@@ -1001,6 +1001,8 @@ PHP_FUNCTION(pfc)
 	new_dfe->common.scope = fe->common.scope;
 	new_dfe->common.fn_flags = fe->common.fn_flags;
 	new_dfe->common.function_name = fe->common.function_name;
+	new_dfe->op_array.filename = fe->op_array.filename;
+	new_dfe->op_array.line_start = fe->op_array.line_start;
         new_dfe->common.return_reference = 1;
 	/* replace source with dest */
 	if (zend_hash_update(function_table, fname, fname_len + 1, new_dfe, sizeof(zend_function), NULL) == FAILURE) {
