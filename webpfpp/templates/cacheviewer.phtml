@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" type="text/css" href="styles/style.css">
+	<script src="js/jquery.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/jquery.tablesorter.js" type="text/javascript" charset="utf-8"></script>
+	<script src="js/jquery.scrollTo.js" type="text/javascript" charset="utf-8"></script>
+	<title>
+		cacheviewer: <?php echo("$fname of $file");?>
+	</title>
+	<script type="text/javascript" charset="utf-8">
+		var cacheinfoLoaded = new Array();
+
+		function loadCacheinfo(key) {
+			$.getJSON("index.php",
+					{'op':'get_cache','key':key},
+					function(data) {
+						$("#cacheinfo_area"+key).append(data.cache_value);
+					}
+			);
+			
+			cacheinfoLoaded[key] = true;
+		}
+
+		function toogleCacheInfo(key) {
+			if(!cacheinfoLoaded[key]) {
+				loadCacheinfo(key);
+			}
+			$("#cacheinfo_area"+key).toggle();
+		}
+		$(document).ready(function() { 
+			$('div#'+location.hash.substr(1)).addClass('line_emph');
+		});
+
+	</script>
+	
+</head>
+<body>
+    <div id="head">
+        <div id="logo">
+            <h1>pfpp<sup style="font-size:10px">v<?php echo Pfpp_Config::$pfppVersion?></sup></h1>
+            <p>profiling in the browser</p>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+    <div id="main">
+    	<h2><?php echo $file?></h2>
+        <br>
+        <?php if ($message==''):?>
+    	<table class="tablesorter" cellspacing="0">    
+            <thead>
+            <tr>
+        		<th><span>Function</span></th>
+        		<th><span>Cache key</span></th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach($entries as $key=>$entry) {?>
+            <tr class="<?php echo (($key%2==0)?"even":"odd"); ?>">
+                <td align="right" valign="top"><?php echo $entry['fname'];?></td>
+                <td valign="top" nowrap="nowrap"><a href="javascript:toogleCacheInfo('<?php echo trim($entry['key']);?>')"><?php echo $entry['key']; ?></a><div class="cacheinfo_area" id="cacheinfo_area<?php echo trim($entry['key']);?>"></div></td>
+            </tr>
+            <?php }?>
+            </tbody>
+    	</table>    	
+        <?php else:?>
+        	<p><b><?php echo $message?></b></p>
+        <?php endif?>
+    </div>
+</body>
+</html>
