@@ -70,7 +70,7 @@ typedef struct {
 
 
 
-/* pfc function profile maintains a stack of entries being profiled. The memory for the entry
+/* pfc inprove function profile maintains a stack of entries being profiled. The memory for the entry
  * is passed by the layer that invokes BEGIN_PROFILING(), e.g. the hp_execute()
  * function. Often, this is just C-stack memory.
  *
