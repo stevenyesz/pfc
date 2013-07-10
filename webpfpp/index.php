@@ -224,7 +224,7 @@ try {
         			
         			foreach ($profileInfo['rows'] as $key=>$row){
         				if($parent == $row['functionName']){
-        					$result['calledFrom'][] = array('functionNr'=>$key,'line'=>2,'callCount'=>$row['invocationCount'],'summedCallCost'=>$row['summedInclusiveCost'],'file'=>'abc','callerFunctionName'=>$parent);
+        					$result['calledFrom'][] = array('functionNr'=>$key,'line'=>$row['line'],'callCount'=>$row['invocationCount'],'summedCallCost'=>$row['summedInclusiveCost'],'file'=>$row['file'],'callerFunctionName'=>$parent);
         					break;
         				}
         			}
@@ -234,7 +234,7 @@ try {
         		foreach ($profileInfo['callinfo']['children'] as $child) {
         			foreach ($profileInfo['rows'] as $key=>$row){
         				if($child == $row['functionName']){
-        					$result['subCalls'][] = array('functionNr'=>$key,'line'=>2,'callCount'=>$row['invocationCount'],'summedCallCost'=>$row['summedInclusiveCost'],'file'=>'abc','callerFunctionName'=>$child);
+        					$result['subCalls'][] = array('functionNr'=>$key,'line'=>$row['line'],'callCount'=>$row['invocationCount'],'summedCallCost'=>$row['summedInclusiveCost'],'file'=>$row['file'],'callerFunctionName'=>$child);
         					break;
         				}
         			}
