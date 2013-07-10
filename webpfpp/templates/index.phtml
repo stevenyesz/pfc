@@ -229,11 +229,16 @@
 			}
 
 			if(data.cacheStatus == 'cached'){
-				openLink += '<a title="stop cache" href="javascript:deleteCache('+'\''+data.functionName+'\''+')">'+'<img src="img/file_delete.png" alt="O">'+'</a>';
+				openLink += '<a title="stop cache" href="javascript:deleteCache('+'\''+data.functionName+'\''+')">'+'<img src="img/cache_clean.png" alt="O">'+'</a>';
 				openLink += '<a title="Open file" href="'+'index.php?op=viewcache'+'" target="_blank"><img src="img/file_view2.png" alt="O"></a>';
 			} else {
-				openLink += '<a title="cache me" href="javascript:doCache('+'\''+data.functionName+'\''+')">'+' <img src="img/file_lock.png" alt="O">'+'</a>';
+				openLink += '<a title="cache me" href="javascript:doCache('+'\''+data.functionName+'\''+')">'+' <img src="img/cache.png" alt="O">'+'</a>';
 			}
+
+			vars = getOptions();
+			vars.file = vars.dataFile;
+			openLink += '<a title="Open file" href="'+'callgraph.php?file='+vars.file+'&func='+ data.functionName +'" target="_blank"><img src="img/diagram.png" alt="O"></a>';
+			
 			return '<tr> \
 			            <td> \
 			                <img src="img/call_'+data.humanKind+'.png" title="'+data.humanKind+'"> \
