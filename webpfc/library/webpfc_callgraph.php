@@ -538,7 +538,7 @@ function webpfc_get_content_by_run($raw_data, $func, $type,$threshold, $critical
 		return "";
 	}
 
-	$script = webpfc_generate_dot_script($raw_data, $func, $threshold , $critical_path);
+	$script = webpfc_generate_dot_script($raw_data, $func, $threshold , $critical);
 
 	$content = webpfc_generate_image_by_dot($script, $type);
 	return $content;
