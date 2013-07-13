@@ -10,24 +10,17 @@ var svg = d3.select("body").append("svg")
 .append("g")
 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var parseDate = d3.time.format("%Y-%M-%d %H:%M:%S").parse,
-formatPercent = d3.format(".0%");
-
-var y = d3.scale.linear()
-	.range([height, 0]);
-var x = d3.scale.ordinal()
-	.rangeBands([0, width]);
 function updateD3Area(specificFile) {
 	d3.tsv("data_tsv.php?file="+specificFile, function(error, data) {
-		y.domain([0, d3.max(data, function(d) { return d.Totaltime; })]);
-		//y.domain(d3.extent(data, function(d) { return d.date; }));
+		var tmax = d3.max(data, function(d) {return parseInt(d.Totaltime);});
+		var yh = height/tmax;
 		var barwid = width/data.length;
 		svg.selectAll("rect")
 		.data(data)
 		.enter().append("rect")
 		.attr("x", function(d, i) { return i * barwid; })
-		.attr("y", function(d) {return y(d.Totaltime);})
-		.attr("height", function(d) {return height -  y(d.Totaltime);})
+		.attr("y", function(d) {return height - yh*d.Totaltime;})
+		.attr("height", function(d) {return  (yh * d.Totaltime);})
 		.attr("width",barwid);
 	});
 }
