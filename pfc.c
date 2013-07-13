@@ -273,6 +273,18 @@ PHP_RINIT_FUNCTION(pfc)
 	zend_compile_file = pfc_compile_file;
 	pfc_old_execute = zend_execute;
 	zend_execute = mhp_execute;
+
+	/* {{{ Initialize auto globals in Zend Engine 2 */
+	zend_is_auto_global("_ENV",     sizeof("_ENV")-1     TSRMLS_CC);
+	zend_is_auto_global("_GET",     sizeof("_GET")-1     TSRMLS_CC);
+	zend_is_auto_global("_POST",    sizeof("_POST")-1    TSRMLS_CC);
+	zend_is_auto_global("_COOKIE",  sizeof("_COOKIE")-1  TSRMLS_CC);
+	zend_is_auto_global("_REQUEST", sizeof("_REQUEST")-1 TSRMLS_CC);
+	zend_is_auto_global("_FILES",   sizeof("_FILES")-1   TSRMLS_CC);
+	zend_is_auto_global("_SERVER",  sizeof("_SERVER")-1  TSRMLS_CC);
+	zend_is_auto_global("_SESSION", sizeof("_SESSION")-1 TSRMLS_CC);
+	/* }}} */
+
 	PFC_G(profiler_enabled) = 0;
 	PFC_G(entry_free_list) = NULL;
 	for (i = 0; i < 256; i++) {
@@ -389,6 +401,9 @@ int pfc_profiler_log( TSRMLS_DC) {
 		while ((char_ptr = strpbrk(strval, "/\\.?&+:*\"<>| ")) != NULL) {
 						char_ptr[0] = '_';
 		}			
+	}else{
+		strval = emalloc(strlen("norequesturi") + 1);
+			sprintf(strval,"norequesturi");
 	}
 
 	 fname = emalloc(strlen("pfc.out..") + strlen(strval) +1 + 10);//10 for time stamp 1 for string end
@@ -445,6 +460,10 @@ int pfc_profiler_init(char *script_name TSRMLS_DC)
 		while ((char_ptr = strpbrk(strval, "/\\.?&+:*\"<>| ")) != NULL) {
 						char_ptr[0] = '_';
 		}			
+	}else{
+
+		strval = emalloc(strlen("cache") + 1);
+		sprintf(strval, "cache");
 	}
 	
         fname = emalloc(strlen("cachegrind.out.") + strlen(strval) +1);
@@ -476,7 +495,6 @@ int pfc_load_functions(void)
 
        class_name = fname = buf;
 	config_file_name = malloc(strlen(PFC_G(data_dir)) + strlen(PFC_G(config_file)) +2);
-	
 	sprintf(config_file_name,"%s/%s",PFC_G(data_dir),PFC_G(config_file));
 	file = fopen(config_file_name,"r");
 	free(config_file_name);
