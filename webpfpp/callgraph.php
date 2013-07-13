@@ -20,7 +20,7 @@ $params = array(// run id param
                 // only functions whose exclusive time over the total time
                 // is larger than this threshold will be shown.
                 // default is 0.01.
-                'threshold' => array(WEBPFC_FLOAT_PARAM, 0.00000001),
+                'threshold' => array(WEBPFC_FLOAT_PARAM, 0.01),
                 // whether to show critical_path
                 'critical' => array(WEBPFC_BOOL_PARAM, true),
                 );
@@ -36,6 +36,11 @@ if ($threshold < 0 || $threshold > 1) {
 // if invalid value specified for type, use the default
 if (!array_key_exists($type, $webpfc_legal_image_types)) {
   $type = $params['type'][1]; // default image type.
+}
+
+if($file=='0'){
+	$files = Pfpp_FileHandler::getInstance()->getTraceList();
+	$file = $files[0]['filename'];
 }
 
 $raw_data = Pfpp_FileHandler::getInstance()->getProfileDataRaw($file,'ms');
