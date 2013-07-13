@@ -3,7 +3,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
-	<title>pfpp</title>
+	<title>webpfc</title>
 	<link rel="stylesheet" type="text/css" href="styles/style.css">
 	<link rel="stylesheet" type="text/css" href="styles/d3drawarea.css">
 	<script src="js/jquery.js" type="text/javascript" charset="utf-8"></script>
@@ -15,7 +15,7 @@
 	<script src="http://d3js.org/d3.v3.min.js"></script>
 	
 	<script type="text/javascript" charset="utf-8">
-		var fileUrlFormat = '<?php echo Pfpp_Config::$fileUrlFormat?>';
+		var fileUrlFormat = '<?php echo Pfc_Config::$fileUrlFormat?>';
 		var currentDataFile = null;
 		var callInfoLoaded = new Array();
 		var disableAjaxBlock = false;
@@ -50,7 +50,7 @@
 					currentDataFile = data.dataFile;
 					$("#data_file").html(data.dataFile);
 					$("#invoke_url").html(data.invokeUrl);
-					$(document).attr('title', 'pfpp of '+data.invokeUrl);
+					$(document).attr('title', 'webpfc of '+data.invokeUrl);
 					$("#mtime").html(data.mtime);
 					$("#shown_sum").html(data.functions.length);
 					$("#invocation_sum").html(data.summedInvocationCount);
@@ -276,7 +276,7 @@
 			$.getJSON("index.php",
 				{'op':'version_info'},
 				function(data){
-					if(data.latest_version><?php echo Pfpp_Config::$pfppVersion?>){
+					if(data.latest_version><?php echo Pfc_Config::$webpfcVersion?>){
 						$("#version_info").append('Version '+data.latest_version+' is available for <a href="'+data.download_url+'">download</a>.');
 					} else {
 						$("#version_info").append('You have the latest version.');
@@ -311,7 +311,7 @@
 				update(document.location.hash.substr(1));
 			}
 			
-			<?php if(Pfpp_Config::$checkVersion):?>
+			<?php if(Pfc_Config::$checkVersion):?>
 			setTimeout(checkVersion,100);
 			<?php endif?>
 
@@ -345,9 +345,9 @@
             	<div style="float:right;">
             		<label style="margin:0 5px">in</label>
             		<select id="costFormat" name="costFormat">
-            		    <option value="percent" <?php echo (Pfpp_Config::$defaultCostformat=='percent') ? 'selected' : ''?>>percent</option>
-            		    <option value="msec" <?php echo (Pfpp_Config::$defaultCostformat=='msec') ? 'selected' : ''?>>milliseconds</option>
-            		    <option value="usec" <?php echo (Pfpp_Config::$defaultCostformat=='usec') ? 'selected' : ''?>>microseconds</option>
+            		    <option value="percent" <?php echo (Pfc_Config::$defaultCostformat=='percent') ? 'selected' : ''?>>percent</option>
+            		    <option value="msec" <?php echo (Pfc_Config::$defaultCostformat=='msec') ? 'selected' : ''?>>milliseconds</option>
+            		    <option value="usec" <?php echo (Pfc_Config::$defaultCostformat=='usec') ? 'selected' : ''?>>microseconds</option>
             		</select>
             	</div>
             	-->
@@ -355,9 +355,9 @@
             		<label style="margin:0 5px">of</label>
             		<select id="dataFile" name="dataFile" style="width:200px">
             			<option value="0">Auto (newest)</option>
-            			<?php foreach(Pfpp_FileHandler::getInstance()->getTraceList() as $trace):?>
+            			<?php foreach(Pfc_FileHandler::getInstance()->getTraceList() as $trace):?>
                             <!-- <option value="<?php echo $trace['filename']?>"><?php //echo $trace['invokeUrl']?> (<?php echo $trace['filename']?>) [<?php echo $trace['filesize']?>]</option> -->
-                            <option value="<?php echo $trace['filename']?>"><?php echo str_replace(array('%i','%f','%s','%m'),array($trace['invokeUrl'],$trace['filename'],$trace['filesize'],$trace['mtime']),Pfpp_Config::$traceFileListFormat); ?></option>
+                            <option value="<?php echo $trace['filename']?>"><?php echo str_replace(array('%i','%f','%s','%m'),array($trace['invokeUrl'],$trace['filename'],$trace['filesize'],$trace['mtime']),Pfc_Config::$traceFileListFormat); ?></option>
             			<?php endforeach;?>
             		</select>
         			<img class="list_reload" src="img/reload.png" onclick="reloadFilelist()">
@@ -366,19 +366,19 @@
             		<label style="margin:0 5px">Show</label>
             		<select id="showFraction" name="showFraction">
             			<?php for($i=100; $i>0; $i-=10):?>
-            			<option value="<?php echo $i/100?>" <?php if ($i==Pfpp_Config::$defaultFunctionPercentage):?>selected="selected"<?php endif;?>><?php echo $i?>%</option>
+            			<option value="<?php echo $i/100?>" <?php if ($i==Pfc_Config::$defaultFunctionPercentage):?>selected="selected"<?php endif;?>><?php echo $i?>%</option>
             			<?php endfor;?>
             		</select>
             	</div>
             	<div style="clear:both;"></div>    	
             	<div style="margin:0 70px">
-            	    <input type="checkbox" name="hideInternals" value="1" <?php echo (Pfpp_Config::$defaultHideInternalFunctions==1) ? 'checked' : ''?> id="hideInternals">
+            	    <input type="checkbox" name="hideInternals" value="1" <?php echo (Pfc_Config::$defaultHideInternalFunctions==1) ? 'checked' : ''?> id="hideInternals">
             	    <label for="hideInternals">Hide PHP functions</label>
             	</div>
             </form>
         </div>
         <div id="logo">
-            <h1>PFPP<sup style="font-size:10px">v<?php echo Pfpp_Config::$pfppVersion?></sup></h1>
+            <h1>PFPP<sup style="font-size:10px">v<?php echo Pfc_Config::$webpfcVersion?></sup></h1>
             <p>php function profile & performance</p>
         </div>
         <div style="clear:both;"></div>
@@ -422,7 +422,7 @@
         </div>
         <h2 id="hello_message"><?php echo $welcome?></h2>
         <div id="footer">
-            <?php if(Pfpp_Config::$checkVersion):?>
+            <?php if(Pfc_Config::$checkVersion):?>
         	<div id="version_info">&nbsp;</div>
         	<?php endif?>
             Copyright © 2012-2013 xiaofeng ye. <a href="http://github.com/xiaofengye/phpfunctioncache/">PFPP (php function profile & performance) homepage</a>

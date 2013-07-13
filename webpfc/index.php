@@ -111,21 +111,21 @@ function cachefInsert($fname) {
 
 // Make sure we have a timezone for date functions.
 if (ini_get('date.timezone') == '')
-    date_default_timezone_set( Pfpp_Config::$defaultTimezone );
+    date_default_timezone_set( Pfc_Config::$defaultTimezone );
 
 try {
     switch(get('op')){
         case 'file_list':
-            echo json_encode(Pfpp_FileHandler::getInstance()->getTraceList());
+            echo json_encode(Pfc_FileHandler::getInstance()->getTraceList());
             break;
         case 'function_list':
             $dataFile = get('dataFile');
             if($dataFile=='0'){
-                $files = Pfpp_FileHandler::getInstance()->getTraceList();
+                $files = Pfc_FileHandler::getInstance()->getTraceList();
                 $dataFile = $files[0]['filename'];
             }
             
-            $profileInfo = Pfpp_FileHandler::getInstance()->getProfileData($dataFile,'ms');
+            $profileInfo = Pfc_FileHandler::getInstance()->getProfileData($dataFile,'ms');
             
             $shownTotal = 0;
             $breakdown = array('internal' => 0, 'procedural' => 0, 'class' => 0, 'include' => 0);
@@ -153,7 +153,7 @@ try {
             			$humanKind = 'class';
             			$kind = 'green';
             		} else {
-            			$breakdown['user'] += $functionInfo['summedSelfCost'];
+            			if(isset($breakdown['user'])) $breakdown['user'] += $functionInfo['summedSelfCost'];
             			$humanKind = 'procedural';
             			$kind = 'orange';
             		}
@@ -201,7 +201,7 @@ try {
             $result['invokeUrl'] = "invokeUrl not implemented yet";
             $result['runs'] = $runs;
             $result['breakdown'] = $breakdown;
-            $result['mtime'] = date(Pfpp_Config::$dateFormat,filemtime(Pfpp_Config::xdebugOutputDir().$dataFile));
+            $result['mtime'] = date(Pfc_Config::$dateFormat,filemtime(Pfc_Config::xdebugOutputDir().$dataFile));
 
             $result['linkToFunctionLine'] = true;
             
@@ -211,11 +211,11 @@ try {
         	$dataFile = get('file');
         	$functionName = urldecode(get('functionName'));
         	if($dataFile=='0'){
-        		$files = Pfpp_FileHandler::getInstance()->getTraceList();
+        		$files = Pfc_FileHandler::getInstance()->getTraceList();
         		$dataFile = $files[0]['filename'];
         	}
         	
-        	$profileInfo = Pfpp_FileHandler::getInstance()->getProfileData($dataFile,'ms',$functionName);
+        	$profileInfo = Pfc_FileHandler::getInstance()->getProfileData($dataFile,'ms',$functionName);
         	usort($profileInfo['rows'],'sort_cbk');
         	$result = array('calledFrom'=>array(), 'subCalls'=>array());
         	$result['calledByHost'] = false;
@@ -280,7 +280,7 @@ try {
           echo json_encode($result);
           break;
     	case 'version_info':
-    		$response = @file_get_contents('http://jokke.dk/pfppupdate.json?version='.Pfpp_Config::$pfppVersion);
+    		$response = @file_get_contents('http://jokke.dk/webpfcupdate.json?version='.Pfc_Config::$webpfcVersion);
     		echo $response;
     	break;
     	case 'cachef_insert':
@@ -297,15 +297,15 @@ try {
     	break;
     	default:
             $welcome = '';
-            if (!file_exists(Pfpp_Config::storageDir()) || !is_writable(Pfpp_Config::storageDir())) {
-                $welcome .= 'Pfpp $storageDir does not exist or is not writeable: <code>'.Pfpp_Config::storageDir().'</code><br>';
+            if (!file_exists(Pfc_Config::storageDir()) || !is_writable(Pfc_Config::storageDir())) {
+                $welcome .= 'Pfc $storageDir does not exist or is not writeable: <code>'.Pfc_Config::storageDir().'</code><br>';
             }
-            if (!file_exists(Pfpp_Config::xdebugOutputDir()) || !is_readable(Pfpp_Config::xdebugOutputDir())) {
-                $welcome .= 'Pfpp $profilerDir does not exist or is not readable: <code>'.Pfpp_Config::xdebugOutputDir().'</code><br>';
+            if (!file_exists(Pfc_Config::xdebugOutputDir()) || !is_readable(Pfc_Config::xdebugOutputDir())) {
+                $welcome .= 'Pfc $profilerDir does not exist or is not readable: <code>'.Pfc_Config::xdebugOutputDir().'</code><br>';
             }
 
             if ($welcome == '') {
-                $welcome = 'Select a cachegrind file above<br>(looking in <code>'.Pfpp_Config::xdebugOutputDir().'</code> for files matching <code>'.Pfpp_Config::profileOutputFormat().'</code>)';
+                $welcome = 'Select a cachegrind file above<br>(looking in <code>'.Pfc_Config::xdebugOutputDir().'</code> for files matching <code>'.Pfc_Config::profileOutputFormat().'</code>)';
             }
             require 'templates/index.phtml';
     }

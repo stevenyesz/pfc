@@ -39,10 +39,10 @@ if (!array_key_exists($type, $webpfc_legal_image_types)) {
 }
 
 if($file=='0'){
-	$files = Pfpp_FileHandler::getInstance()->getTraceList();
+	$files = Pfc_FileHandler::getInstance()->getTraceList();
 	$file = $files[0]['filename'];
 }
 
-$raw_data = Pfpp_FileHandler::getInstance()->getProfileDataRaw($file,'ms');
+$raw_data = Pfc_FileHandler::getInstance()->getProfileDataRaw($file,'ms');
 
 webpfc_render_image($raw_data,$func,$type,$threshold,$critical);

@@ -1,10 +1,10 @@
 <?php
 /**
- * Class handling access to data-files(original and preprocessed) for pfpp.
+ * Class handling access to data-files(original and preprocessed) for webpfc.
  * @author Jacob Oettinger
  * @author Joakim Nygård
  */
-class Pfpp_FileHandler{
+class Pfc_FileHandler{
 	
 	private static $singleton = null;
 	/**
@@ -18,13 +18,13 @@ class Pfpp_FileHandler{
 		
 	private function __construct(){
 		// Get list of files matching the defined format
-		$files = $this->getFiles(Pfpp_Config::profileOutputFormat(), Pfpp_Config::xdebugOutputDir());
+		$files = $this->getFiles(Pfc_Config::profileOutputFormat(), Pfc_Config::xdebugOutputDir());
 		
 		// Get list of preprocessed files
-        $prepFiles = $this->getPrepFiles('/\\'.Pfpp_Config::$preprocessedSuffix.'$/', Pfpp_Config::storageDir());
+        $prepFiles = $this->getPrepFiles('/\\'.Pfc_Config::$preprocessedSuffix.'$/', Pfc_Config::storageDir());
 		// Loop over the preprocessed files.		
 		foreach($prepFiles as $fileName=>$prepFile){
-			$fileName = str_replace(Pfpp_Config::$preprocessedSuffix,'',$fileName);
+			$fileName = str_replace(Pfc_Config::$preprocessedSuffix,'',$fileName);
 			
 			// If it is older than its corrosponding original: delete it.
 			// If it's original does not exist: delete it
@@ -46,8 +46,8 @@ class Pfpp_FileHandler{
 	 * @return void string
 	 */	
 	private function getInvokeUrl($file){
-	    if (preg_match('/.pfpp$/', $file)) 
-	        return 'Pfpp internal';
+	    if (preg_match('/.webpfc$/', $file)) 
+	        return 'Pfc internal';
 
 		// Grab name of invoked file. 
 	    $fp = fopen($file, 'r');
@@ -87,8 +87,8 @@ class Pfpp_FileHandler{
 			$absoluteFilename = $dir.$file;
 			
 			preg_match($format, $file, $matchs);
-			// Exclude pfpp preprocessed files
-			if (false !== strstr($absoluteFilename, Pfpp_Config::$preprocessedSuffix))
+			// Exclude webpfc preprocessed files
+			if (false !== strstr($absoluteFilename, Pfc_Config::$preprocessedSuffix))
 			    continue;
 			
 			// Make sure that script never parses the profile currently being generated. (infinite loop)
@@ -96,7 +96,7 @@ class Pfpp_FileHandler{
 				continue;
 				
 			$invokeUrl = rtrim($this->getInvokeUrl($absoluteFilename));
-			if (Pfpp_Config::$hidePfppProfiles && $invokeUrl == dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'index.php')
+			if (Pfc_Config::$hidePfcProfiles && $invokeUrl == dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'index.php')
 			    continue;
 			
 			$urlname =  $matchs[3];  
@@ -215,7 +215,7 @@ class Pfpp_FileHandler{
 		return $files;
 	}
 	/**
-	 * Get list of available trace files. Optionally including traces of the pfpp script it self
+	 * Get list of available trace files. Optionally including traces of the webpfc script it self
 	 *
 	 * @return array Files
 	 */
@@ -225,7 +225,7 @@ class Pfpp_FileHandler{
 			$result[] = array('filename'  => $file['filename'], 
 			                  'invokeUrl' => str_replace($_SERVER['DOCUMENT_ROOT'].'/', '', $file['invokeUrl']),
 			                  'filesize'  => $file['filesize'],
-			                  'mtime'     => date(Pfpp_Config::$dateFormat, $file['mtime'])
+			                  'mtime'     => date(Pfc_Config::$dateFormat, $file['mtime'])
 			            );
 		}
 		return $result;
@@ -238,22 +238,22 @@ class Pfpp_FileHandler{
 	 *
 	 * @param string File to read
 	 * @param Cost format for the reader
-	 * @return Pfpp_Reader Reader for $file
+	 * @return Pfc_Reader Reader for $file
 	 */
 	public function getTraceReader($file, $costFormat){
-		$prepFile = Pfpp_Config::storageDir().$file.Pfpp_Config::$preprocessedSuffix;
+		$prepFile = Pfc_Config::storageDir().$file.Pfc_Config::$preprocessedSuffix;
 		try{
-			$r = new Pfpp_Reader($prepFile, $costFormat);
+			$r = new Pfc_Reader($prepFile, $costFormat);
 		} catch (Exception $e){
 			// Preprocessed file does not exist or other error
-			Pfpp_Preprocessor::parse(Pfpp_Config::xdebugOutputDir().$file, $prepFile);
-			$r = new Pfpp_Reader($prepFile, $costFormat);
+			Pfc_Preprocessor::parse(Pfc_Config::xdebugOutputDir().$file, $prepFile);
+			$r = new Pfc_Reader($prepFile, $costFormat);
 		}
 		return $r;
 	}
 	
 	public function getProfileDataRaw($file) {
-		$realFile = Pfpp_Config::xdebugOutputDir().$file;
+		$realFile = Pfc_Config::xdebugOutputDir().$file;
 		if (!file_exists($realFile)) {
      		error_log("Could not find file $realFile");
       		return null;

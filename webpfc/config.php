@@ -1,32 +1,32 @@
 <?php
-class Pfpp_MasterConfig
+class Pfc_MasterConfig
 {
-    static $pfppVersion = '1.1';
+    static $webpfcVersion = '1.1';
 }
 
 /**
- * Configuration for pfpp
+ * Configuration for webpfc
  * @author Jacob Oettinger
  * @author Joakim Nygård
  */
-class Pfpp_Config extends Pfpp_MasterConfig {
+class Pfc_Config extends Pfc_MasterConfig {
 	/**
-	* Automatically check if a newer version of pfpp is available for download
+	* Automatically check if a newer version of webpfc is available for download
 	*/
 	static $checkVersion = true;
-	static $hidePfppProfiles = true;
+	static $hidePfcProfiles = true;
 	
 	/**
 	* Writable dir for information storage.
 	* If empty, will use system tmp folder or xdebug tmp
 	*/
 	static $storageDir = '/opt/samba/pfcstorage';
-	static $profilerDir = '/opt/samba/pfcstorage/profile';
+	static $profilerDir = '/opt/samba/memoize/profile';
 	
 	/**
 	* Suffix for preprocessed files
 	*/
-	static $preprocessedSuffix = '.pfpp';
+	static $preprocessedSuffix = '.webpfc';
 	
 	static $defaultTimezone = 'Europe/Copenhagen';
 	static $dateFormat = 'Y-m-d H:i:s';
@@ -88,25 +88,25 @@ class Pfpp_Config extends Pfpp_MasterConfig {
     }
 	
     static function tsvdir() {
-    	return realpath(Pfpp_Config::$profilerDir).'/'.'datatsv/';
+    	return realpath(Pfc_Config::$profilerDir).'/'.'datatsv/';
     }
 	/**
 	* Directory to search for trace files
 	*/
 	static function xdebugOutputDir() {
-		return realpath(Pfpp_Config::$profilerDir).'/';
+		return realpath(Pfc_Config::$profilerDir).'/';
 	}
 	
 	/**
 	* Writable dir for information storage
 	*/
 	static function storageDir() {
-	    if (!empty(Pfpp_Config::$storageDir))
-	        return realpath(Pfpp_Config::$storageDir).'/';
+	    if (!empty(Pfc_Config::$storageDir))
+	        return realpath(Pfc_Config::$storageDir).'/';
 	        
 	    if (!function_exists('sys_get_temp_dir') || !is_writable(sys_get_temp_dir())) {
 	        # use xdebug setting
-            return Pfpp_Config::xdebugOutputDir();
+            return Pfc_Config::xdebugOutputDir();
 	    }
 	    return realpath(sys_get_temp_dir()).'/';
 	}
