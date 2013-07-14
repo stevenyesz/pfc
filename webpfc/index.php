@@ -33,7 +33,7 @@ function sort_cbk($a, $b)
 
 function getCacheKeys($fileName) {
   $msg = '';
-  $fileName = ini_get('memoize.data_dir').'/cache/'.$fileName;
+  $fileName = Pfc_Config::storageDir().'cache/'.$fileName;
   if(!$file = fopen($fileName, 'r'))
   {
     $msg = "can't open cache log file $fileName";
@@ -59,7 +59,7 @@ function cachefConvertname($fname) {
 }
 
 function cachefGetFilename() {
-  $fileName = ini_get('pfc.data_dir').'/'.ini_get('pfc.config_file');
+  $fileName = Pfc_Config::storageDir().'/'.ini_get('pfc.config_file');
   return $fileName;
 }
 
@@ -201,7 +201,7 @@ try {
             $result['invokeUrl'] = "invokeUrl not implemented yet";
             $result['runs'] = $runs;
             $result['breakdown'] = $breakdown;
-            $result['mtime'] = date(Pfc_Config::$dateFormat,filemtime(Pfc_Config::xdebugOutputDir().$dataFile));
+            $result['mtime'] = date(Pfc_Config::$dateFormat,filemtime(Pfc_Config::profileDir().'/'.$dataFile));
 
             $result['linkToFunctionLine'] = true;
             
@@ -300,12 +300,9 @@ try {
             if (!file_exists(Pfc_Config::storageDir()) || !is_writable(Pfc_Config::storageDir())) {
                 $welcome .= 'Pfc $storageDir does not exist or is not writeable: <code>'.Pfc_Config::storageDir().'</code><br>';
             }
-            if (!file_exists(Pfc_Config::xdebugOutputDir()) || !is_readable(Pfc_Config::xdebugOutputDir())) {
-                $welcome .= 'Pfc $profilerDir does not exist or is not readable: <code>'.Pfc_Config::xdebugOutputDir().'</code><br>';
-            }
 
             if ($welcome == '') {
-                $welcome = 'Select a cachegrind file above<br>(looking in <code>'.Pfc_Config::xdebugOutputDir().'</code> for files matching <code>'.Pfc_Config::profileOutputFormat().'</code>)';
+                $welcome = 'Select a cachegrind file above<br>(looking in <code>'.Pfc_Config::storageDir().'</code> for files matching <code>'.Pfc_Config::profileOutputFormat().'</code>)';
             }
             require 'templates/index.phtml';
     }

@@ -18,21 +18,8 @@ class Pfc_FileHandler{
 		
 	private function __construct(){
 		// Get list of files matching the defined format
-		$files = $this->getFiles(Pfc_Config::profileOutputFormat(), Pfc_Config::xdebugOutputDir());
+		$files = $this->getFiles(Pfc_Config::profileOutputFormat(), Pfc_Config::profileDir().'/');
 		
-		// Get list of preprocessed files
-        $prepFiles = $this->getPrepFiles('/\\'.Pfc_Config::$preprocessedSuffix.'$/', Pfc_Config::storageDir());
-		// Loop over the preprocessed files.		
-		foreach($prepFiles as $fileName=>$prepFile){
-			$fileName = str_replace(Pfc_Config::$preprocessedSuffix,'',$fileName);
-			
-			// If it is older than its corrosponding original: delete it.
-			// If it's original does not exist: delete it
-			if(!isset($files[$fileName]) || $files[$fileName]['mtime']>$prepFile['mtime'] )
-				unlink($prepFile['absoluteFilename']);
-			else
-				$files[$fileName]['preprocessed'] = true;
-		}
 		// Sort by mtime
 		uasort($files,array($this,'mtimeCmp'));
 		
@@ -75,10 +62,7 @@ class Pfc_FileHandler{
 		
 		$scriptFilename = $_SERVER['SCRIPT_FILENAME'];
 		
-		if (function_exists('xdebug_get_profiler_filename'))
-		    $selfFile = realpath(xdebug_get_profiler_filename());
-		else 
-		    $selfFile = '';
+
 		    
 		$this->createTsvDir($dir);
 		
@@ -201,9 +185,6 @@ class Pfc_FileHandler{
 		foreach($list as $file){
 			$absoluteFilename = $dir.$file;
 			
-			// Make sure that script does not include the profile currently being generated. (infinite loop)
-			if (function_exists('xdebug_get_profiler_filename') && realpath(xdebug_get_profiler_filename())==realpath($absoluteFilename))
-				continue;
 				
 			$files[$file] = array('absoluteFilename' => $absoluteFilename, 
 			                      'mtime' => filemtime($absoluteFilename), 
@@ -246,14 +227,13 @@ class Pfc_FileHandler{
 			$r = new Pfc_Reader($prepFile, $costFormat);
 		} catch (Exception $e){
 			// Preprocessed file does not exist or other error
-			Pfc_Preprocessor::parse(Pfc_Config::xdebugOutputDir().$file, $prepFile);
-			$r = new Pfc_Reader($prepFile, $costFormat);
+			
 		}
 		return $r;
 	}
 	
 	public function getProfileDataRaw($file) {
-		$realFile = Pfc_Config::xdebugOutputDir().$file;
+		$realFile = Pfc_Config::profileDir().'/'.$file;
 		if (!file_exists($realFile)) {
      		error_log("Could not find file $realFile");
       		return null;
