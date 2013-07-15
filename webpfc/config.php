@@ -4,11 +4,6 @@ class Pfc_MasterConfig
     static $webpfcVersion = '1.1';
 }
 
-/**
- * Configuration for webpfc
- * @author Jacob Oettinger
- * @author Joakim Nygård
- */
 class Pfc_Config extends Pfc_MasterConfig {
 	/**
 	* Automatically check if a newer version of webpfc is available for download
@@ -43,8 +38,6 @@ class Pfc_Config extends Pfc_MasterConfig {
 	* %2$d will be replaced by the linenumber
 	*/
 	static $fileUrlFormat = 'index.php?op=fileviewer&file=%1$s#line%2$d'; // Built in fileviewer
-	//static $fileUrlFormat = 'txmt://open/?url=file://%1$s&line=%2$d'; // Textmate
-	//static $fileUrlFormat = 'file://%1$s'; // ?
 
     /**
     * format of the trace drop down list                                                                                                                                                      
