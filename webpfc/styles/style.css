@@ -58,6 +58,12 @@ h2 {
 
 #main {
 	margin:10px;
+    float:left;
+}
+
+#leftpanel {
+	float:left;
+	margin:2px;
 }
 
 #hello_message {
@@ -173,3 +179,4 @@ a.load_invocations {
 	border: 1px solid #333;
 	padding: 2px;
 }
+

@@ -1,8 +1,6 @@
 <?php
 /**
  * Class handling access to data-files(original and preprocessed) for webpfc.
- * @author Jacob Oettinger
- * @author Joakim Nygård
  */
 class Pfc_FileHandler{
 	
@@ -246,7 +244,6 @@ class Pfc_FileHandler{
  * Takes a parent/child function name encoded as
  * "a==>b" and returns array("a", "b").
  *
- * @author Kannan
  */
 function parse_parent_child($parent_child) {
   $ret = explode("==>", $parent_child);
@@ -270,7 +267,6 @@ function parse_parent_child($parent_child) {
  * @return array  Returns a map of function name to total (across all parents)
  *                inclusive metrics for the function.
  *
- * @author Kannan
  */
 function compute_inclusive_times($raw_data) {
   $display_calls = 1;

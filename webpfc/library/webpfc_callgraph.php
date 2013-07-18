@@ -104,7 +104,6 @@ function webpfc_parse_parent_child($parent_child) {
  * Given parent & child function name, composes the key
  * in the format present in the raw data.
  *
- * @author Kannan
  */
 function webpfc_build_parent_child_key($parent, $child) {
 	if ($parent) {
@@ -589,7 +588,6 @@ $webpfc_legal_image_types = array(
  *
  * @param string   name of the URL query string param
  *
- * @author Kannan
  */
 function webpfc_get_param_helper($param) {
 	$val = null;
@@ -606,7 +604,6 @@ function webpfc_get_param_helper($param) {
  * string. If param is not specified, return the
  * $default value.
  *
- * @author Kannan
  */
 function webpfc_get_string_param($param, $default = '') {
 	$val = webpfc_get_param_helper($param);
@@ -625,7 +622,6 @@ function webpfc_get_string_param($param, $default = '') {
  * If value is not a valid unsigned integer, logs error
  * and returns null.
  *
- * @author Kannan
  */
 function webpfc_get_uint_param($param, $default = 0) {
 	$val = webpfc_get_param_helper($param);
@@ -654,7 +650,6 @@ function webpfc_get_uint_param($param, $default = 0) {
  * If value is not a valid unsigned integer, logs error
  * and returns null.
  *
- * @author Kannan
  */
 function webpfc_get_float_param($param, $default = 0) {
 	$val = webpfc_get_param_helper($param);
@@ -681,7 +676,6 @@ function webpfc_get_float_param($param, $default = 0) {
  * If value is not a valid unsigned integer, logs error
  * and returns null.
  *
- * @author Kannan
  */
 function webpfc_get_bool_param($param, $default = false) {
 	$val = webpfc_get_param_helper($param);
@@ -736,7 +730,6 @@ function webpfc_get_bool_param($param, $default = false) {
  *                       If a param is not specified in the
  *                       query string the default value is
  *                       used.
- * @author Kannan
  */
 function webpfc_param_init($params) {
 	/* Create variables specified in $params keys, init defaults */

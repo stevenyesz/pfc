@@ -12,7 +12,7 @@
 	<script src="js/jquery.selectboxes.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/jquery.autocomplete.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/sprintf.js" type="text/javascript" charset="utf-8"></script>
-	<script src="http://d3js.org/d3.v3.min.js"></script>
+	<script src="js/d3.v3.min.js"></script>
 	
 	<script type="text/javascript" charset="utf-8">
 		var fileUrlFormat = '<?php echo Pfc_Config::$fileUrlFormat?>';
@@ -383,11 +383,13 @@
         </div>
         <div style="clear:both;"></div>
     </div>
-    <div id="chart">
+	<div id="leftpanel">
+    	show data files here
+    </div>
+    <div id="main">
+            <div id="chart">
     </div>
     <script src="js/d3drawarea.js" type="text/javascript" charset="utf-8"></script>
-    <div id="main">
-        
         <div id="trace_view">
         	<div style="float:left;">
         	    <h2 id="invoke_url"></h2>
@@ -428,6 +430,6 @@
             Copyright © 2012-2013 xiaofeng ye. <a href="http://github.com/xiaofengye/phpfunctioncache/">PFPP (php function profile & performance) homepage</a>
         </div>
     </div>
+    
 </body>
-
 </html>
