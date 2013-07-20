@@ -435,17 +435,17 @@ int pfc_profiler_log( TSRMLS_DC) {
 void pfc_profiler_deinit(TSRMLS_D) {
 
 	if(PFC_G(profiler_file)) fclose(PFC_G(profiler_file));
+	if(PFC_G(sclog_file) && PFC_G(buf_singelog_len) > 0) fprintf(PFC_G(sclog_file), "%s", PFC_G(buf_singlelog));
+	if(PFC_G(sclog_file)) fclose(PFC_G(sclog_file));
 }
 
 
-
-int pfc_profiler_init(char *script_name TSRMLS_DC)
-{
-	char *filename = NULL, *fname = NULL;
-	zval **data;
-	char *char_ptr, *strval;
-	int retval = FAILURE;
-	if (PG(http_globals)[TRACK_VARS_SERVER]) {
+char  *pfc_get_request_uri(char *script_name) {
+	  char *char_ptr, *strval;
+	  int retval = FAILURE;
+	  zval **data;
+		
+	  if (PG(http_globals)[TRACK_VARS_SERVER]) {
 		retval = zend_hash_find(Z_ARRVAL_P(PG(http_globals)[TRACK_VARS_SERVER]), "REQUEST_URI", sizeof("REQUEST_URI"), (void **) &data);
 
 		if (retval == SUCCESS) {
@@ -465,6 +465,22 @@ int pfc_profiler_init(char *script_name TSRMLS_DC)
 		strval = emalloc(strlen("cache") + 1);
 		sprintf(strval, "cache");
 	}
+
+	return strval;
+}
+
+/***
+* prepare files and directory
+* generate file stream for cache key insert
+*
+***/
+
+int pfc_profiler_init(char *script_name TSRMLS_DC)
+{
+	char *filename = NULL, *fname = NULL;
+	char  *strval;
+
+	strval = pfc_get_request_uri(script_name);
 	
         fname = emalloc(strlen("cachegrind.out.") + strlen(strval) +1);
         sprintf(fname,"cachegrind.out.%s",strval);
@@ -1291,6 +1307,50 @@ void pfc_mode_hier_beginfn_cb(mhp_entry_t **entries,
 }
 
 
+int  pfc_log_single_call(mhp_entry_t *call, uint64 stc_end) {
+       char *callinfo;
+	int i=0;
+
+	callinfo =emalloc(strlen(call->name_hprof) + 23);
+	sprintf(callinfo,"%s\t%lld\t%lld\n",call->name_hprof,(call->tsc_start - PFC_G(start)), (stc_end - call->tsc_start));
+
+	if(PFC_G(buf_singelog_len) + strlen(callinfo) + 1 > 1024) {//buffer is full
+		fprintf(PFC_G(sclog_file), "%s", PFC_G(buf_singlelog));
+		memset(PFC_G(buf_singlelog), 0, sizeof(char)*1024);
+		PFC_G(buf_singelog_len) = 0;
+	}
+
+	//save into buffer
+	for(i=0; i< strlen(callinfo); i++){
+		PFC_G(buf_singlelog)[PFC_G(buf_singelog_len)+i] = callinfo[i];
+	}
+	PFC_G(buf_singelog_len) = PFC_G(buf_singelog_len) + strlen(callinfo);
+	
+	return SUCCESS;
+}
+
+static int pfc_profile_trigger_enabled(char *var_name TSRMLS_DC)
+{
+	zval **dummy;
+
+	if (
+		(
+			PG(http_globals)[TRACK_VARS_GET] &&
+			zend_hash_find(PG(http_globals)[TRACK_VARS_GET]->value.ht, var_name, strlen(var_name) + 1, (void **) &dummy) == SUCCESS
+		) || (
+			PG(http_globals)[TRACK_VARS_POST] &&
+			zend_hash_find(PG(http_globals)[TRACK_VARS_POST]->value.ht, var_name, strlen(var_name) + 1, (void **) &dummy) == SUCCESS
+		) || (
+			PG(http_globals)[TRACK_VARS_COOKIE] &&
+			zend_hash_find(PG(http_globals)[TRACK_VARS_COOKIE]->value.ht, var_name, strlen(var_name) + 1, (void **) &dummy) == SUCCESS
+		)
+	) {
+		return 1;
+	}
+
+	return 0;
+}
+
 /**
  * XHPROF shared end function callback
  *
@@ -1307,6 +1367,10 @@ zval * pfc_mode_shared_endfn_cb(mhp_entry_t *top,
  // tsc_end = cycle_timer();
   tsc_end = pfc_get_utime();
 
+  /* log sime call */
+  if(pfc_profile_trigger_enabled("PFC_SINGLE_TRACE" TSRMLS_DC)) {
+  	pfc_log_single_call(top, tsc_end);
+  }
   /* Get the stat array */
   if (!(counts = pfc_hash_lookup(symbol, top->filename, top->line TSRMLS_CC))) {
     return (zval *) 0;
@@ -1505,7 +1569,9 @@ static void get_all_cpu_frequencies() {
 
 
 int pfc_function_profile_init(TSRMLS_DC) {
-	if(!PFC_G(function_profile_ever_enabled)){
+	
+	
+	if(!PFC_G(function_profile_ever_enabled)){//only init once 
 		PFC_G(function_profile_ever_enabled) = 1;
 		PFC_G(function_profile_entries) = NULL;
 		PFC_G(stats_count) = NULL;
@@ -1513,39 +1579,37 @@ int pfc_function_profile_init(TSRMLS_DC) {
 		MAKE_STD_ZVAL(PFC_G(stats_count));
 		array_init(PFC_G(stats_count));
 
-		/* NOTE(cjiang): some fields such as cpu_frequencies take relatively longer
+		/* NOTE  some fields such as cpu_frequencies take relatively longer
 		* to initialize, (5 milisecond per logical cpu right now), therefore we
 		* calculate them lazily. */
 		if (PFC_G(cpu_frequencies) == NULL) {
 		get_all_cpu_frequencies();
 		}
+
+		//prepare log file for single call log and init log buffer
+		if(pfc_profile_trigger_enabled("PFC_SINGLE_TRACE" TSRMLS_DC)) {
+			char *strval= NULL, *filename = NULL, *fname = NULL;
+			time_t t = time(NULL);
+
+			PFC_G(start) = pfc_get_utime();
+			
+			strval = pfc_get_request_uri(NULL);
+			fname = emalloc(strlen("cachegrind.sclog.") + strlen(strval) +11);
+        		sprintf(fname,"cachegrind.sclog.%ld.%s",t,strval);
+        		filename = emalloc(strlen(PFC_G(data_dir)) + strlen(fname) + 8);
+		       sprintf(filename,"%s/sclog/%s",PFC_G(data_dir), fname);
+	 		efree(fname);
+			PFC_G(sclog_file)= fopen(filename,"w");
+			efree(filename);
+			if(strlen(strval) > 0) efree(strval);
+			if(!PFC_G(sclog_file)) return FAILURE;
+			memset(PFC_G(buf_singlelog), 0, sizeof(char)*1024);
+			PFC_G(buf_singelog_len) = 0;
+		}
 	}
 
+	return SUCCESS;
 	
-	
-}
-
-
-static int pfc_profile_trigger_enabled(char *var_name TSRMLS_DC)
-{
-	zval **dummy;
-
-	if (
-		(
-			PG(http_globals)[TRACK_VARS_GET] &&
-			zend_hash_find(PG(http_globals)[TRACK_VARS_GET]->value.ht, var_name, strlen(var_name) + 1, (void **) &dummy) == SUCCESS
-		) || (
-			PG(http_globals)[TRACK_VARS_POST] &&
-			zend_hash_find(PG(http_globals)[TRACK_VARS_POST]->value.ht, var_name, strlen(var_name) + 1, (void **) &dummy) == SUCCESS
-		) || (
-			PG(http_globals)[TRACK_VARS_COOKIE] &&
-			zend_hash_find(PG(http_globals)[TRACK_VARS_COOKIE]->value.ht, var_name, strlen(var_name) + 1, (void **) &dummy) == SUCCESS
-		)
-	) {
-		return 1;
-	}
-
-	return 0;
 }
 
 int pfc_function_profile_deinit(TSRMLS_DC) {

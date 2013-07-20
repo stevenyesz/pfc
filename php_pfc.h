@@ -111,8 +111,12 @@ ZEND_BEGIN_MODULE_GLOBALS(pfc)
 	long default_ttl;
 	zend_bool profiler_enabled;
 	FILE *profiler_file;
+	FILE *sclog_file;
 	int function_profile_ever_enabled;
+	uint64 start;//start timestamp of a request
        zval *stats_count;
+	char buf_singlelog[1024];   
+	uint64 buf_singelog_len;
 	mhp_entry_t *function_profile_entries;
 	mhp_entry_t *entry_free_list;
 	 /* counter table indexed by hash value of function names. */
