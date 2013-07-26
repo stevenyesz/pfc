@@ -10,7 +10,6 @@ class Pfc_Config extends Pfc_MasterConfig {
 	*/
 	static $checkVersion = true;
 	static $hidePfcProfiles = true;
-		
 	/**
 	* Suffix for preprocessed files
 	*/
