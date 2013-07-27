@@ -329,7 +329,18 @@
 			            row.css('display', 'none');
 			    });
   		});
-		});
+			$("#linkfilter").keyup(function(){
+			    var reg = new RegExp($(this).val(), 'i');
+			    var row;
+			    $('#loglinks').children('tbody').children('tr').each(function(){
+			        row = $(this);
+			        if (row.find('td:eq(0) a').text().match(reg))
+			            row.css('display', 'table-row');
+			        else
+			            row.css('display', 'none');
+			    });
+  		});
+	});
 	</script>
 </head>
 <body>
@@ -374,11 +385,12 @@
         <div style="clear:both;"></div>
     </div>
 	<div id="leftpanel">
-    	<div class= "loglinks">
+	<input type="text" style="border:1px solid #4D90FE; background:white; width:150px" id="linkfilter">
+    	<table id="loglinks" class= "loglinks"><tbody>
     	<?php foreach(Pfc_FileHandler::getInstance()->getTraceList() as $trace):?>
-                <div class="loglink"><a onclick='update("<?php echo $trace['filename'];?>");'><?php echo substr($trace['filename'], 19,15)."<br>@".$trace['mtime'];?></a></div>
+                <tr><td><a onclick='update("<?php echo $trace['filename'];?>");'><?php echo substr($trace['filename'], 19,15)."<br>@".$trace['mtime'];?></a></td></tr>
        <?php endforeach;?>
-       </div>
+       </tbody></table>
     </div>
     <div id="main">
             <div id="chart">
@@ -396,7 +408,7 @@
         	</div>
         	
         	<div style="clear:both"></div>
-        	Filter: <input type="text" style="width:150px" id="callfilter"> (regex too) <h4 class="fright">IC:Invocation Count TSC:Total Self Cost ASC:Average Self Cost PS:Percent Selft TI:Total Inclusive PI:Percent Inclusive</h2> 
+        	<input type="text" style="border:1px solid #4D90FE; background:white; width:150px" id="callfilter"><h4 class="fright">IC:Invocation Count TSC:Total Self Cost ASC:Average Self Cost PS:Percent Selft TI:Total Inclusive PI:Percent Inclusive</h2> 
         	<table class="tablesorter" id="function_table" cellspacing="0">
         		<thead>
         		    <tr>
