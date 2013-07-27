@@ -15,13 +15,14 @@
 	<script src="js/d3.v3.min.js"></script>
 	
 	<script type="text/javascript" charset="utf-8">
-		var fileUrlFormat = '<?php echo Pfc_Config::$fileUrlFormat?>';
-		var currentDataFile = null;
+	  var fileUrlFormat = '<?php echo Pfc_Config::$fileUrlFormat?>';
+	  var currentDataFile = null;
 		var callInfoLoaded = new Array();
 		var disableAjaxBlock = false;
 		function getOptions(specificFile){
 			var options = new Object();
 			options.dataFile = specificFile || $("#dataFile").val();
+			if(specificFile) $("#dataFile").val(specificFile);
 			options.costFormat = $('#costFormat').val();
 			options.showFraction = $("#showFraction").val();
 			options.hideInternals = $('#hideInternals').attr('checked') ? 1 : 0;
@@ -58,15 +59,15 @@
 					$("#runs").html(data.runs);
 					
 					var breakdown_sum = data.breakdown['internal']+data.breakdown['procedural']+data.breakdown['class']+data.breakdown['include'];
-                    $("#breakdown").html(
-                        '<img src="img/gradient_left.png" height="20" width="10">'+
-                        '<img src="img/gradient_internal.png" height="20" width="'+Math.floor(data.breakdown['internal']/breakdown_sum*300)+'">'+
-                        '<img src="img/gradient_include.png" height="20" width="'+Math.floor(data.breakdown['include']/breakdown_sum*300)+'">'+
-                        '<img src="img/gradient_class.png" height="20" width="'+Math.floor(data.breakdown['class']/breakdown_sum*300)+'">'+
-                        '<img src="img/gradient_procedural.png" height="20" width="'+Math.floor(data.breakdown['procedural']/breakdown_sum*300)+'">'+
-                        '<img src="img/gradient_right.png" height="20" width="10">'+
-                        '<div title="internal functions, include/require, class methods and procedural functions." style="position:relative;top:-20px;left:10px;width:301px;height:19px"></div>'
-                    );
+                  $("#breakdown").html(
+                      '<img src="img/gradient_left.png" height="20" width="10">'+
+                      '<img src="img/gradient_internal.png" height="20" width="'+Math.floor(data.breakdown['internal']/breakdown_sum*300)+'">'+
+                      '<img src="img/gradient_include.png" height="20" width="'+Math.floor(data.breakdown['include']/breakdown_sum*300)+'">'+
+                      '<img src="img/gradient_class.png" height="20" width="'+Math.floor(data.breakdown['class']/breakdown_sum*300)+'">'+
+                      '<img src="img/gradient_procedural.png" height="20" width="'+Math.floor(data.breakdown['procedural']/breakdown_sum*300)+'">'+
+                      '<img src="img/gradient_right.png" height="20" width="10">'+
+                      '<div title="internal functions, include/require, class methods and procedural functions." style="position:relative;top:-20px;left:10px;width:301px;height:19px"></div>'
+                  );
 					
 					$("#hello_message").hide();
 					$("#trace_view").show();
@@ -212,9 +213,9 @@
 		function openCallInfo(functionNr) {
 			var areaEl = $("#callinfo_area_"+functionNr);
 			if (areaEl.length) {
-    			if (areaEl.is(":hidden")) toggleCallInfo(functionNr);
-    			window.scrollTo(0, areaEl.parent().offset().top);
-    		}
+  			if (areaEl.is(":hidden")) toggleCallInfo(functionNr);
+  			window.scrollTo(0, areaEl.parent().offset().top);
+  		}
 		}
 		
 		function functionTableRow(data, linkToFunctionLine){
@@ -327,9 +328,8 @@
 			        else
 			            row.css('display', 'none');
 			    });
-    		});
+  		});
 		});
-		
 	</script>
 </head>
 <body>
@@ -341,23 +341,13 @@
             	<div style="float:right;margin-left:10px">
             	    <input type="submit" value="update">
             	</div>
-            	<!--  
-            	<div style="float:right;">
-            		<label style="margin:0 5px">in</label>
-            		<select id="costFormat" name="costFormat">
-            		    <option value="percent" <?php echo (Pfc_Config::$defaultCostformat=='percent') ? 'selected' : ''?>>percent</option>
-            		    <option value="msec" <?php echo (Pfc_Config::$defaultCostformat=='msec') ? 'selected' : ''?>>milliseconds</option>
-            		    <option value="usec" <?php echo (Pfc_Config::$defaultCostformat=='usec') ? 'selected' : ''?>>microseconds</option>
-            		</select>
-            	</div>
-            	-->
             	<div style="float:right;">
             		<label style="margin:0 5px">of</label>
             		<select id="dataFile" name="dataFile" style="width:200px">
             			<option value="0">Auto (newest)</option>
             			<?php foreach(Pfc_FileHandler::getInstance()->getTraceList() as $trace):?>
                             <!-- <option value="<?php echo $trace['filename']?>"><?php //echo $trace['invokeUrl']?> (<?php echo $trace['filename']?>) [<?php echo $trace['filesize']?>]</option> -->
-                            <option value="<?php echo $trace['filename']?>"><?php echo str_replace(array('%i','%f','%s','%m'),array($trace['invokeUrl'],$trace['filename'],$trace['filesize'],$trace['mtime']),Pfc_Config::$traceFileListFormat); ?></option>
+                            <option value="<?php echo $trace['filename']?>"><?php echo str_replace(array('%i','%f','%s','%m'),array('',$trace['filename'],$trace['filesize'],$trace['mtime']),Pfc_Config::$traceFileListFormat); ?></option>
             			<?php endforeach;?>
             		</select>
         			<img class="list_reload" src="img/reload.png" onclick="reloadFilelist()">
@@ -384,7 +374,11 @@
         <div style="clear:both;"></div>
     </div>
 	<div id="leftpanel">
-    	show data files here
+    	<div class= "loglinks">
+    	<?php foreach(Pfc_FileHandler::getInstance()->getTraceList() as $trace):?>
+                <div class="loglink"><a onclick='update("<?php echo $trace['filename'];?>");'><?php echo substr($trace['filename'], 19,15)."<br>@".$trace['mtime'];?></a></div>
+       <?php endforeach;?>
+       </div>
     </div>
     <div id="main">
             <div id="chart">
@@ -402,7 +396,7 @@
         	</div>
         	
         	<div style="clear:both"></div>
-        	Filter: <input type="text" style="width:150px" id="callfilter"> (regex too)
+        	Filter: <input type="text" style="width:150px" id="callfilter"> (regex too) <h4 class="fright">IC:Invocation Count TSC:Total Self Cost ASC:Average Self Cost PS:Percent Selft TI:Total Inclusive PI:Percent Inclusive</h2> 
         	<table class="tablesorter" id="function_table" cellspacing="0">
         		<thead>
         		    <tr>
@@ -410,12 +404,12 @@
         		        <th><span>Function</span></th>
         		        <th> </th>
         		        <th> </th>
-        		        <th><span>Invocation Count</span></th>
-        		        <th><span>Total Self Cost</span></th>
-        		        <th><span>Avg Self Cost</span></th>
-        		        <th><span>Percent Self Cost</span></th>
-        		        <th><span>Total Inclusive Cost</span></th>
-        		        <th><span>Percent Inclusive Cost</span></th>
+        		        <th><span>IC</span></th>
+        		        <th><span>TSC</span></th>
+        		        <th><span>ASC</span></th>
+        		        <th><span>PS</span></th>
+        		        <th><span>TI</span></th>
+        		        <th><span>PI</span></th>
         		    </tr>
         		</thead>
         		<tbody>
@@ -427,7 +421,7 @@
             <?php if(Pfc_Config::$checkVersion):?>
         	<div id="version_info">&nbsp;</div>
         	<?php endif?>
-            Copyright © 2012-2013 xiaofeng ye. <a href="http://github.com/xiaofengye/phpfunctioncache/">PFPP (php function profile & performance) homepage</a>
+            Copyright @ 2012-2013 xiaofeng ye. <a href="https://github.com/stevenyesz/pfc/">PFC homepage</a>
         </div>
     </div>
     
