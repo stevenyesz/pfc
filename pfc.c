@@ -479,7 +479,10 @@ int pfc_profiler_init(char *script_name TSRMLS_DC)
 {
 	char *filename = NULL, *fname = NULL;
 	char  *strval;
-
+	char *cachedir;
+	char *profiledir;
+	char *sclogdir;
+	
 	strval = pfc_get_request_uri(script_name);
 	
         fname = emalloc(strlen("cachegrind.out.") + strlen(strval) +1);
@@ -487,6 +490,21 @@ int pfc_profiler_init(char *script_name TSRMLS_DC)
         filename = emalloc(strlen(PFC_G(data_dir)) + strlen(fname) + 8);
 	 sprintf(filename,"%s/cache/%s",PFC_G(data_dir), fname);
 	 efree(fname);
+
+	cachedir = emalloc(strlen(PFC_G(data_dir)) + strlen("cache") + 1);
+	sprintf(cachedir,"%s/cache",PFC_G(data_dir));
+	mkdir(cachedir,S_IRWXU|S_IRWXG|S_IRWXO);
+	efree(cachedir);
+
+	profiledir = emalloc(strlen(PFC_G(data_dir)) + strlen("profile") + 1);
+	sprintf(profiledir,"%s/profile",PFC_G(data_dir));
+	mkdir(profiledir,S_IRWXU|S_IRWXG|S_IRWXO);
+	efree(profiledir);
+
+	sclogdir = emalloc(strlen(PFC_G(data_dir)) + strlen("sclog") + 1);
+	sprintf(sclogdir,"%s/sclog",PFC_G(data_dir));
+	mkdir(sclogdir,S_IRWXU|S_IRWXG|S_IRWXO);
+	efree(sclogdir);
 	
        PFC_G(profiler_file)= fopen(filename,"w");
 	if(!PFC_G(profiler_file)) return FAILURE;
@@ -512,7 +530,7 @@ int pfc_load_functions(void)
        class_name = fname = buf;
 	config_file_name = malloc(strlen(PFC_G(data_dir)) + strlen(PFC_G(config_file)) +2);
 	sprintf(config_file_name,"%s/%s",PFC_G(data_dir),PFC_G(config_file));
-	file = fopen(config_file_name,"r");
+	file = fopen(config_file_name,"a+");
 	free(config_file_name);
 	if(file) {
 	    while( (c = getc(file)) != EOF && line_len <= 100) {
