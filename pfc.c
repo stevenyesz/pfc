@@ -1612,8 +1612,8 @@ int pfc_function_profile_init(TSRMLS_DC) {
 			PFC_G(start) = pfc_get_utime();
 			
 			strval = pfc_get_request_uri(NULL);
-			fname = emalloc(strlen("cachegrind.sclog.") + strlen(strval) +11);
-        		sprintf(fname,"cachegrind.sclog.%ld.%s",t,strval);
+			fname = emalloc(strlen("pfc.sclog.") + strlen(strval) +11);
+        		sprintf(fname,"pfc.sclog.%ld.%s",t,strval);
         		filename = emalloc(strlen(PFC_G(data_dir)) + strlen(fname) + 8);
 		       sprintf(filename,"%s/sclog/%s",PFC_G(data_dir), fname);
 	 		efree(fname);

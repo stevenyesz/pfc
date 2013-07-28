@@ -28,12 +28,31 @@
 			options.hideInternals = $('#hideInternals').attr('checked') ? 1 : 0;
 			return options;
 		}
+
+		function updateHistoryProfiles(dataFile){
+			$.getJSON("index.php",
+					{'op':'getHistoryProfiles','dataFile':dataFile},
+					function(data){
+						$links = '';
+						for(i=0;i<data.length;i++)
+							$links += '<div>'+data[i].mtime+'</div>';
+						$("#pfc_profiles").html("History Profiles:"+$links);
+					}
+			);	
+		}
+
+		function updateCallSerials(dataFile){
+
+		}
+
 		
 		function update(specificFile){
 			vars = getOptions(specificFile);
 			vars.op = 'function_list';
 			$("body svg g").empty();
 			updateD3Area(vars.dataFile);
+			updateHistoryProfiles(vars.dataFile);
+			updateCallSerials(vars.dataFile);
 			$.getJSON("index.php",
 				vars,
 				function(data){
@@ -88,6 +107,12 @@
 			delete vars.dataFile;
 			delete vars.showFraction;
 			window.open('callgraph.php?' + $.param(vars));
+		}
+
+		function showCallSerial() {
+			vars = getOptions();
+			vars.dataFile = vars.dataFile;
+			window.open('sclog.php?' + $.param(vars));
 		}
 		
 		function reloadFilelist(){
@@ -393,10 +418,20 @@
        </tbody></table>
     </div>
     <div id="main">
-            <div id="chart">
+    <div id="north">
+    	<div id="chart" class="fleft">
+    	</div>
+    	<div id="history" class="fright">
+    		<div id="pfc_profiles">
+    		</div>
+    		<div id="pfc_callserials">
+    		</div>
+    		
+    	</div>
+    	<div style="clear:both"></div>
     </div>
     <script src="js/d3drawarea.js" type="text/javascript" charset="utf-8"></script>
-        <div id="trace_view">
+    <div id="trace_view">
         	<div style="float:left;">
         	    <h2 id="invoke_url"></h2>
         	    <span id="data_file"></span> @ <span id="mtime"></span>

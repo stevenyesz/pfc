@@ -108,6 +108,21 @@ function cachefInsert($fname) {
 
 	return true;
 }
+function pfc_ajax_get_history_profiles($dataFile) {
+	$result = array();
+	$matchs = array();
+	preg_match(Pfc_Config::profileOutputFormat(), $dataFile, $matchs);
+	$urlname =  $matchs[3];  
+	$timestamp = $matchs[2]; 
+	$realPath = Pfc_Config::profileDir().'/'.$urlname;
+	if(file_exists($realPath)){
+		$files = preg_grep(Pfc_Config::profileOutputFormat(),scandir($realPath));
+		foreach ($files as $file){
+			$result[] = array('filename'=>$file,'mtime'=>date("Y-m-d H:i:s",filemtime($realPath.'/'.$filename)));
+		}
+	}
+	return json_encode($result);
+}
 
 function pfc_ajax_get_function_list($dataFile) {
 	$profileInfo = Pfc_FileHandler::getInstance()->getProfileData($dataFile,'ms');
@@ -301,6 +316,11 @@ try {
 			cachefDelete(cachefConvertname($fname));
 			$result = array('status'=>'ok');
 			echo json_encode($result);
+			break;
+		case 'getHistoryProfiles':
+				$dataFile = pfc_request_get_datafile();
+				$result = pfc_ajax_get_history_profiles($dataFile);
+				echo $result;
 			break;
 		default:
 			$welcome = '';

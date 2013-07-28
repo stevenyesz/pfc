@@ -70,6 +70,7 @@ class Pfc_Config extends Pfc_MasterConfig {
     static function profileDir() {
     	return Pfc_Config::storageDir().'/profile';
     }
+    
 	/**
 	* Writable dir for information storage
 	*/

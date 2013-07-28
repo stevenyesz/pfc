@@ -1,8 +1,13 @@
 
 <?
-
+require './config.php';
 require_once 'convert.php';
-$rawData = file_get_contents('sclog5.csv');
+
+$sclogDir = Pfc_Config::storageDir()."/"."sclog";
+$dataFile = $_GET['dataFile'];
+$dataFile = str_replace('pfc.out', 'pfc.sclog', $dataFile);
+$realPaht = $sclogDir."/".$dataFile;
+$rawData = file_get_contents($realPaht);
 $barData = getResultData($rawData, 600);
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -10,7 +15,7 @@ $barData = getResultData($rawData, 600);
 <html>
 <head>
 <link rel="stylesheet" type="text/css" href="styles/d3drawarea.css">
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="js/d3.v3.min.js"></script>
 
 </head>
 <body>
