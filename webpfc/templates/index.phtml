@@ -131,7 +131,7 @@
 
 		function loadCallInfo(functionNr,functionName){			
 			$.getJSON("index.php",
-				{'op':'callinfo_list', 'file':currentDataFile, 'functionName':functionName, 'costFormat':$("#costFormat").val()},
+				{'op':'callinfo_list', 'dataFile':currentDataFile, 'functionName':functionName, 'costFormat':$("#costFormat").val()},
 				function(data){
 					if (data.error) {
 				        $("#hello_message").html(data.error);

@@ -193,7 +193,7 @@ function pfc_ajax_get_function_list($dataFile) {
 	return json_encode($result);
 }
 
-function pfc_ajax_get_callinfo($datafile) {
+function pfc_ajax_get_callinfo($dataFile,$functionName) {
 	$profileInfo = Pfc_FileHandler::getInstance()->getProfileData($dataFile,'ms',$functionName);
 	usort($profileInfo['rows'],'sort_cbk');
 	$result = array('calledFrom'=>array(), 'subCalls'=>array());
@@ -245,7 +245,8 @@ try {
 			break;
 		case 'callinfo_list':
 			$dataFile = pfc_request_get_datafile();
-			echo pfc_ajax_get_callinfo($datafile);
+			$functionName = get('functionName');
+			echo pfc_ajax_get_callinfo($dataFile,$functionName);
 			break;
 		case 'fileviewer':
 			$file = get('file');
