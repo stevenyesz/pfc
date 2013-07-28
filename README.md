@@ -19,5 +19,5 @@ PHP extension:
 webpfc
      if you web document root is /var/www, just copy the webpfc into /var/www/webpfc
      and now you can use the web gui by goto http://your server name/webpfc
-
+     install firefox addon https://addons.mozilla.org/en-US/firefox/addon/php-function-cache/
 if any question about pfc, please email to: lightning_heat@163.com
