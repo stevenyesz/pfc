@@ -657,7 +657,6 @@ void pfc_arguments_hash(int argc, char *fname, zval ***args, zval **object, char
  * Get the name of the current function. The name is qualified with
  * the class name if the function is in a class.
  *
- * @author kannan, hzhao
  */
 static char *mhp_get_function_name(zend_op_array *ops TSRMLS_DC) {
   zend_execute_data *data;
@@ -708,7 +707,12 @@ static char *mhp_get_function_name(zend_op_array *ops TSRMLS_DC) {
       /* we are dealing with a special directive/function like
        * include, eval, etc.
        */
+       #if ZEND_MODULE_API_NO  >= 20100525
+      curr_op = data->opline->extended_value;
+	#else
       curr_op = data->opline->op2.u.constant.value.lval;
+	#endif
+	
       switch (curr_op) {
         case ZEND_EVAL:
           func = "eval";
@@ -1055,7 +1059,11 @@ PHP_FUNCTION(pfc)
 	new_dfe->common.function_name = fe->common.function_name;
 	new_dfe->op_array.filename = fe->op_array.filename;
 	new_dfe->op_array.line_start = fe->op_array.line_start;
-        new_dfe->common.return_reference = 1;
+	#if ZEND_MODULE_API_NO >= 20100525
+   	new_dfe->common.fn_flags = fe->common.fn_flags | ZEND_ACC_RETURN_REFERENCE;
+	#else
+	new_dfe->common.return_reference = 1;
+	#endif 
 	/* replace source with dest */
 	if (zend_hash_update(function_table, fname, fname_len + 1, new_dfe, sizeof(zend_function), NULL) == FAILURE) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Error replacing %s()", fname);
