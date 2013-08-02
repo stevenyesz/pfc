@@ -6,14 +6,32 @@
 	<title>webpfc</title>
 	<link rel="stylesheet" type="text/css" href="styles/style.css">
 	<link rel="stylesheet" type="text/css" href="styles/d3drawarea.css">
-	<script src="js/jquery.js" type="text/javascript" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="furatto/css/furatto.css">
+	<link rel="stylesheet" type="text/css" href="furatto/css/normalize.css">
+	<script src="furatto/js/furatto.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="furatto/js/jquery.js"></script>
+<script src="furatto/js/jpanel.js"></script>
+<script src="furatto/js/jquery.dropkick-1.0.0.js"></script>
+<script src="furatto/js/jquery.icheck.js"></script>
+<script src="furatto/js/rainbow-custom.min.js"></script>
+<script src="furatto/js/tooltip.js"></script>
+<script src="furatto/js/jquery.tagsinput.js"></script>
+<script src="furatto/js/picker.js"></script>
+<script src="furatto/js/picker.date.js"></script>
+<script src="furatto/js/picker.time.js"></script>
+<script src="furatto/js/legacy.js"></script>
+<script src="furatto/js/jquery.toolbar.js"></script>
+<script src="furatto/js/jquery.avgrund.js"></script>
+<script src="furatto/js/responsiveslides.js"></script>
+<script src="furatto/js/responsive-tables.js"></script>
+<script src="furatto/js/dropdown.js"></script>
+<script src="furatto/js/manifest.js"></script>
 	<script src="js/jquery.blockUI.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/jquery.tablesorter.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/jquery.selectboxes.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/jquery.autocomplete.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/sprintf.js" type="text/javascript" charset="utf-8"></script>
 	<script src="js/d3.v3.min.js"></script>
-	
 	<script type="text/javascript" charset="utf-8">
 	  var fileUrlFormat = '<?php echo Pfc_Config::$fileUrlFormat?>';
 	  var currentDataFile = null;
@@ -368,18 +386,17 @@
 	});
 	</script>
 </head>
-<body>
+<body style="padding:0">
     
     <div id="head">
         
         <div id="options">
             <form method="get" onsubmit="update();return false;">
             	<div style="float:right;margin-left:10px">
-            	    <input type="submit" value="update">
+            	    <input type="submit" value="update" class="btn btn-primary">
             	</div>
             	<div style="float:right;">
-            		<label style="margin:0 5px">of</label>
-            		<select id="dataFile" name="dataFile" style="width:200px">
+            		<select id="dataFile" name="dataFile" style="width:200px" data-furatto='select'>
             			<option value="0">Auto (newest)</option>
             			<?php foreach(Pfc_FileHandler::getInstance()->getTraceList() as $trace):?>
                             <!-- <option value="<?php echo $trace['filename']?>"><?php //echo $trace['invokeUrl']?> (<?php echo $trace['filename']?>) [<?php echo $trace['filesize']?>]</option> -->
@@ -389,8 +406,7 @@
         			<img class="list_reload" src="img/reload.png" onclick="reloadFilelist()">
             	</div>
             	<div style="float:right">
-            		<label style="margin:0 5px">Show</label>
-            		<select id="showFraction" name="showFraction">
+            		<select id="showFraction" name="showFraction" data-furatto='select'>
             			<?php for($i=100; $i>0; $i-=10):?>
             			<option value="<?php echo $i/100?>" <?php if ($i==Pfc_Config::$defaultFunctionPercentage):?>selected="selected"<?php endif;?>><?php echo $i?>%</option>
             			<?php endfor;?>
@@ -398,8 +414,8 @@
             	</div>
             	<div style="clear:both;"></div>    	
             	<div style="margin:0 70px">
-            	    <input type="checkbox" name="hideInternals" value="1" <?php echo (Pfc_Config::$defaultHideInternalFunctions==1) ? 'checked' : ''?> id="hideInternals">
-            	    <label for="hideInternals">Hide PHP functions</label>
+            	    <input type="checkbox" name="hideInternals" value="1" <?php echo (Pfc_Config::$defaultHideInternalFunctions==1) ? 'checked' : ''?> id="hideInternals" data-furatto='checkbox'>
+            	    <label for="hideInternals" class="checkbox-label inline">Hide PHP functions</label>
             	</div>
             </form>
         </div>
@@ -411,11 +427,11 @@
     </div>
 	<div id="leftpanel">
 	<input type="text" style="border:1px solid #4D90FE; background:white; width:150px" id="linkfilter">
-    	<table id="loglinks" class= "loglinks"><tbody>
+    	<table id="loglinks" class= "loglinks"><tbody>	
     	<?php foreach(Pfc_FileHandler::getInstance()->getTraceList() as $trace):?>
-                <tr><td><a onclick='update("<?php echo $trace['filename'];?>");'><?php echo substr($trace['filename'], 19,15)."<br>@".$trace['mtime'];?></a></td></tr>
-       <?php endforeach;?>
-       </tbody></table>
+                <tr data-original-title="<?php echo str_replace('_', ' ', $trace['filename']);?>" class="green" data-toggle="tooltip" data-placement="right"><td><a onclick='update("<?php echo $trace['filename'];?>");'><?php echo substr($trace['filename'], 19,15)."<br>@".$trace['mtime'];?></a></td></tr>
+       <?php endforeach;?>   
+      </tbody></table>
     </div>
     <div id="main">
     <div id="north">
@@ -433,7 +449,7 @@
     <script src="js/d3drawarea.js" type="text/javascript" charset="utf-8"></script>
     <div id="trace_view">
         	<div style="float:left;">
-        	    <h2 id="invoke_url"></h2>
+        	    <h4 id="invoke_url"></h2>
         	    <span id="data_file"></span> @ <span id="mtime"></span>
         	</div>
         	<div style="float:right;">
@@ -443,7 +459,7 @@
         	</div>
         	
         	<div style="clear:both"></div>
-        	<input type="text" style="border:1px solid #4D90FE; background:white; width:150px" id="callfilter"><h4 class="fright">IC:Invocation Count TSC:Total Self Cost ASC:Average Self Cost PS:Percent Selft TI:Total Inclusive PI:Percent Inclusive</h2> 
+        	<input type="text" style="border:1px solid #4D90FE; background:white; width:150px" id="callfilter"><span class="fright">IC:Invocation Count TSC:Total Self Cost ASC:Average Self Cost PS:Percent Selft TI:Total Inclusive PI:Percent Inclusive</span> 
         	<table class="tablesorter" id="function_table" cellspacing="0">
         		<thead>
         		    <tr>
@@ -471,6 +487,6 @@
             Copyright @ 2012-2013 xiaofeng ye. <a href="https://github.com/stevenyesz/pfc/">PFC homepage</a>
         </div>
     </div>
-    
+   
 </body>
 </html>
