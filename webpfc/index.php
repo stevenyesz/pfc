@@ -118,7 +118,7 @@ function pfc_ajax_get_history_profiles($dataFile) {
 	if(file_exists($realPath)){
 		$files = preg_grep(Pfc_Config::profileOutputFormat(),scandir($realPath));
 		foreach ($files as $file){
-			$result[] = array('filename'=>$file,'mtime'=>date("Y-m-d H:i:s",filemtime($realPath.'/'.$filename)));
+			$result[] = array('filename'=>$file,'mtime'=>date("Y-m-d H:i:s",substr($file, 8,10)));
 		}
 	}
 	return json_encode($result);
