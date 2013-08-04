@@ -413,7 +413,7 @@
 	<input type="text" style="border:1px solid #4D90FE; background:white; width:150px" id="linkfilter">
     	<table id="loglinks" class= "loglinks"><tbody>
     	<?php foreach(Pfc_FileHandler::getInstance()->getTraceList() as $trace):?>
-                <tr><td><a onclick='update("<?php echo $trace['filename'];?>");'><?php echo substr($trace['filename'], 19,15)."<br>@".$trace['mtime'];?></a></td></tr>
+                <tr><td><a onclick='update("<?php echo $trace['filename'];?>");' title='<?php echo $trace['filename'];?>'><?php echo substr($trace['filename'], 19,15)."<br>@".$trace['mtime'];?></a></td></tr>
        <?php endforeach;?>
        </tbody></table>
     </div>
