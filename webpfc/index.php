@@ -124,8 +124,8 @@ function pfc_ajax_get_history_profiles($dataFile) {
 	return json_encode($result);
 }
 
-function pfc_ajax_get_function_list($dataFile) {
-	$profileInfo = Pfc_FileHandler::getInstance()->getProfileData($dataFile,'ms');
+function pfc_ajax_get_function_list($dataFile, $type='current') {
+	$profileInfo = Pfc_FileHandler::getInstance()->getProfileData($dataFile,'ms',"",$type);
 
 	$shownTotal = 0;
 	$breakdown = array('internal' => 0, 'procedural' => 0, 'class' => 0, 'include' => 0);
@@ -201,7 +201,8 @@ function pfc_ajax_get_function_list($dataFile) {
 	$result['invokeUrl'] = "invokeUrl not implemented yet";
 	$result['runs'] = $runs;
 	$result['breakdown'] = $breakdown;
-	$result['mtime'] = date(Pfc_Config::$dateFormat,filemtime(Pfc_Config::profileDir().'/'.$dataFile));
+	$fileInfo = Pfc_FileHandler::parseFilename($dataFile); 
+	$result['mtime'] = date(Pfc_Config::$dateFormat,$fileInfo['timestamp']);
 
 	$result['linkToFunctionLine'] = true;
 
@@ -256,7 +257,7 @@ try {
 			break;
 		case 'function_list':
 			$dataFile = pfc_request_get_datafile();
-			echo pfc_ajax_get_function_list($dataFile);
+			echo pfc_ajax_get_function_list($dataFile, get('type'));
 			break;
 		case 'callinfo_list':
 			$dataFile = pfc_request_get_datafile();

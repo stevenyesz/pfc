@@ -17,7 +17,9 @@ a:hover {
 #footer a {
 	text-decoration:underline;
 }
-
+.loglinks a {
+	font-size:16px;
+}
 img {
 	border: 0;
 }

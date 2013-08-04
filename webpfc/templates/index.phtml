@@ -19,14 +19,20 @@
 	  var currentDataFile = null;
 		var callInfoLoaded = new Array();
 		var disableAjaxBlock = false;
-		function getOptions(specificFile){
+		function getOptions(specificFile,update=false){
 			var options = new Object();
 			options.dataFile = specificFile || $("#dataFile").val();
-			if(specificFile) $("#dataFile").val(specificFile);
+			if(specificFile && update==true ) $("#dataFile").val(specificFile);
 			options.costFormat = $('#costFormat').val();
 			options.showFraction = $("#showFraction").val();
 			options.hideInternals = $('#hideInternals').attr('checked') ? 1 : 0;
 			return options;
+		}
+
+		
+
+		function updateCallSerials(dataFile){
+
 		}
 
 		function updateHistoryProfiles(dataFile){
@@ -35,24 +41,23 @@
 					function(data){
 						$links = '';
 						for(i=0;i<data.length;i++)
-							$links += '<div>'+data[i].mtime+'</div>';
+							$links += '<div>'+ '<a href="javascript:update('+'\''+data[i].filename+'\''+',true)">' +data[i].mtime+'</a></div>';
 						$("#pfc_profiles").html("History Profiles:"+$links);
 					}
 			);	
 		}
-
-		function updateCallSerials(dataFile){
-
-		}
-
 		
-		function update(specificFile){
-			vars = getOptions(specificFile);
+		function update(specificFile,history=false){
+			vars = getOptions(specificFile, !history);
 			vars.op = 'function_list';
-			$("body svg g").empty();
-			updateD3Area(vars.dataFile);
-			updateHistoryProfiles(vars.dataFile);
-			updateCallSerials(vars.dataFile);
+			if(history == false){
+				$("body svg g").empty();
+				updateD3Area(vars.dataFile);
+				updateHistoryProfiles(vars.dataFile);
+				updateCallSerials(vars.dataFile);
+			}else{
+				vars.type = 'history';
+			}
 			$.getJSON("index.php",
 				vars,
 				function(data){
@@ -99,6 +104,8 @@
 			);
 		}
 
+		
+		
 		function showCallGraph() {
 			vars = getOptions();
 			vars.file = vars.dataFile;
@@ -413,7 +420,7 @@
 	<input type="text" style="border:1px solid #4D90FE; background:white; width:150px" id="linkfilter">
     	<table id="loglinks" class= "loglinks"><tbody>
     	<?php foreach(Pfc_FileHandler::getInstance()->getTraceList() as $trace):?>
-                <tr><td><a onclick='update("<?php echo $trace['filename'];?>");' title='<?php echo $trace['filename'];?>'><?php echo substr($trace['filename'], 19,15)."<br>@".$trace['mtime'];?></a></td></tr>
+                <tr><td><a onclick='update("<?php echo $trace['filename'];?>");' title='<?php echo $trace['filename'];?>'><?php echo substr($trace['filename'], 19,15);?></a></td></tr>
        <?php endforeach;?>
        </tbody></table>
     </div>

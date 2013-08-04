@@ -14,6 +14,12 @@ class Pfc_FileHandler{
 		return self::$singleton;
 	}
 		
+	public static function parseFilename($filename){
+		$matchs = array();
+		preg_match(Pfc_Config::profileOutputFormat(), $filename, $matchs);
+		return array('urlname'=>$matchs[3],'timestamp'=>$matchs[2]);
+	}
+	
 	private function __construct(){
 		// Get list of files matching the defined format
 		$files = $this->getFiles(Pfc_Config::profileOutputFormat(), Pfc_Config::profileDir().'/');
@@ -60,8 +66,6 @@ class Pfc_FileHandler{
 		
 		$scriptFilename = $_SERVER['SCRIPT_FILENAME'];
 		
-
-		    
 		$this->createTsvDir($dir);
 		
 		$matchs = array();  
@@ -72,20 +76,14 @@ class Pfc_FileHandler{
 			// Exclude webpfc preprocessed files
 			if (false !== strstr($absoluteFilename, Pfc_Config::$preprocessedSuffix))
 			    continue;
-			
-			// Make sure that script never parses the profile currently being generated. (infinite loop)
-			if ($selfFile == realpath($absoluteFilename))
-				continue;
-				
+							
 			$invokeUrl = rtrim($this->getInvokeUrl($absoluteFilename));
 			if (Pfc_Config::$hidePfcProfiles && $invokeUrl == dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'index.php')
 			    continue;
 			
 			$urlname =  $matchs[3];  
 			$timestamp = $matchs[2]; 
-			
-			
-			
+						
 			if(!isset($files[$urlname])){//first occurence, the lastes one
 				$files[$urlname] = array('absoluteFilename' => $absoluteFilename, 
 								  'filename' => $file,	
@@ -230,8 +228,17 @@ class Pfc_FileHandler{
 		return $r;
 	}
 	
-	public function getProfileDataRaw($file) {
-		$realFile = Pfc_Config::profileDir().'/'.$file;
+	public function getProfileDataRaw($file,$type='current') {
+		
+		$dir = '';
+		if($type == 'history'){
+			$fileInfo = $this->parseFilename($file);
+			$dir = $fileInfo['urlname'];
+			if(strlen($dir)) $dir .= '/';
+		}
+		//echo '---------------------dir-'.$dir;
+		
+		$realFile = Pfc_Config::profileDir().'/'.$dir.$file;
 		if (!file_exists($realFile)) {
      		error_log("Could not find file $realFile");
       		return null;
@@ -328,11 +335,11 @@ function compute_inclusive_times($raw_data) {
 		return $totalWt;
 	}
 	
-	public function getProfileData($file, $costFormat, $functionName="") {
+	public function getProfileData($file, $costFormat, $functionName="", $type="current") {
 		
 		$display_calls = 1;
 		
-		$raw_data = $this->getProfileDataRaw($file);
+		$raw_data = $this->getProfileDataRaw($file,$type);
 		$overall_totals = array( "ct" => 0,
                            "wt" => 0,
                            "ut" => 0,
